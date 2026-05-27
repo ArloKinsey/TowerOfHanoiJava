@@ -5,7 +5,8 @@ import java.util.Stack;
 public class TowerOfHanoi extends JFrame {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 500;
-    private static final int MAX_DISKS = 5;
+    private static final int MAX_DISKS = 10;
+    private static final int WAIT_TIME = 10; //500 Default
 
     // The three pegs tracked using standard Java Stacks
     private Stack<Integer>[] towers = new Stack[3];
@@ -65,8 +66,8 @@ public class TowerOfHanoi extends JFrame {
         controlPanel.add(customCodeButton);
 
         add(statusLabel, BorderLayout.NORTH);
-        add(largestLabel, BorderLayout.EAST);
-        add(testLabel, BorderLayout.EAST);
+//        add(largestLabel, BorderLayout.EAST);
+//        add(testLabel, BorderLayout.EAST);
         add(gamePanel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
     }
@@ -124,13 +125,10 @@ public class TowerOfHanoi extends JFrame {
         }
 
     }
+    public int storePeg(int currentPeg, int goalPeg){
 
-    public void runGoalPeg(){
-
-        moveDisk(biggestStackPeg(), goalPeg(towers[biggestStackPeg()].size(), biggestStackPeg(), 2));
-
+        return goalPeg(2, currentPeg, goalPeg);
     }
-
     public int biggestStackPeg(){
 
         int currentLargest = 0;
@@ -149,20 +147,131 @@ public class TowerOfHanoi extends JFrame {
         return candidate;
     }
 
-    public void solveTest3Disk(){
+    public void sequence1(int startPeg, int endPeg){
 
-        int goalDisk = MAX_DISKS;
-        int goalPeg = 2;
+        if(startPeg != endPeg){
 
+            moveDisk(startPeg, goalPeg(1, startPeg, endPeg));
+        }
+
+    }
+
+    public void sequence2(int startPeg, int endPeg){
+
+        if(startPeg != endPeg) {
+
+            sequence1(startPeg, storePeg(startPeg, endPeg));
+
+            moveDisk(startPeg, endPeg);
+
+            sequence1(storePeg(startPeg, endPeg), endPeg);
+        }
+    }
+
+    public void sequence3(int startPeg, int endPeg){
+
+        if(startPeg != endPeg) {
+
+            sequence2(startPeg, storePeg(startPeg, endPeg));
+
+            moveDisk(startPeg, endPeg);
+
+            sequence2(storePeg(startPeg, endPeg), endPeg);
+        }
+    }
+
+    public void sequence4(int startPeg, int endPeg){
+
+        if(startPeg != endPeg) {
+
+            sequence3(startPeg, storePeg(startPeg, endPeg));
+
+            moveDisk(startPeg, endPeg);
+
+            sequence3(storePeg(startPeg, endPeg), endPeg);
+        }
+    }
+
+    public void sequence5(int startPeg, int endPeg){
+
+        if(startPeg != endPeg) {
+
+            sequence4(startPeg, storePeg(startPeg, endPeg));
+
+            moveDisk(startPeg, endPeg);
+
+            sequence4(storePeg(startPeg, endPeg), endPeg);
+        }
+    }
+
+    public void sequence6(int startPeg, int endPeg){
+
+        if(startPeg != endPeg) {
+
+            sequence5(startPeg, storePeg(startPeg, endPeg));
+
+            moveDisk(startPeg, endPeg);
+
+            sequence5(storePeg(startPeg, endPeg), endPeg);
+        }
+    }
+
+    public void sequence7(int startPeg, int endPeg){
+
+        if(startPeg != endPeg) {
+
+            sequence6(startPeg, storePeg(startPeg, endPeg));
+
+            moveDisk(startPeg, endPeg);
+
+            sequence6(storePeg(startPeg, endPeg), endPeg);
+        }
+    }
+
+    public void sequence8(int startPeg, int endPeg){
+
+        if(startPeg != endPeg) {
+
+            sequence7(startPeg, storePeg(startPeg, endPeg));
+
+            moveDisk(startPeg, endPeg);
+
+            sequence7(storePeg(startPeg, endPeg), endPeg);
+        }
+    }
+
+    public void sequence9(int startPeg, int endPeg){
+
+        if(startPeg != endPeg) {
+
+            sequence8(startPeg, storePeg(startPeg, endPeg));
+
+            moveDisk(startPeg, endPeg);
+
+            sequence8(storePeg(startPeg, endPeg), endPeg);
+        }
+    }
+
+    public void sequence10(int startPeg, int endPeg){
+
+        if(startPeg != endPeg) {
+
+            sequence9(startPeg, storePeg(startPeg, endPeg));
+
+            moveDisk(startPeg, endPeg);
+
+            sequence9(storePeg(startPeg, endPeg), endPeg);
+        }
     }
 
 
 
 
     private void runMyCustomAlgorithm() {
+//        largestLabel.setText("Peg with largest stack: " + biggestStackPeg());
+//        testLabel.setText("Largest disk: " + towers[0].firstElement());
 
-        largestLabel.setText("Peg with largest stack: " + biggestStackPeg());
-        testLabel.setText("Largest disk: " + towers[0].firstElement());
+        sequence10(0, 2);
 
 
 
@@ -190,7 +299,7 @@ public class TowerOfHanoi extends JFrame {
         gamePanel.repaint();
 
         // Pause for half a second between moves so you can watch your code execute visually
-        try { Thread.sleep(500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        try { Thread.sleep(WAIT_TIME); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
     private void handlePegClick(int pegIndex) {
