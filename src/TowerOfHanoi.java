@@ -1,0 +1,195 @@
+import javax.swing.*;
+import java.awt.*;
+import java.util.Stack;
+
+public class TowerOfHanoi extends JFrame {
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 500;
+    private static final int MAX_DISKS = 5;
+
+    // The three pegs tracked using standard Java Stacks
+    private Stack<Integer>[] towers = new Stack[3];
+    private int totalMoves = 0;
+    private int selectedPeg = -1;
+
+    private GamePanel gamePanel;
+    private JLabel statusLabel;
+
+    public TowerOfHanoi() {
+        setTitle("Tower of Hanoi - My Algorithm Lab");
+        setSize(WIDTH, HEIGHT);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        // Initialize towers and disks
+        for (int i = 0; i < 3; i++) {
+            towers[i] = new Stack<>();
+        }
+        resetDisks();
+
+        // Create UI components
+        gamePanel = new GamePanel();
+        statusLabel = new JLabel("Click a peg to move manually, or press 'Run My Code'!", SwingConstants.CENTER);
+        statusLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel controlPanel = new JPanel();
+        JButton resetButton = new JButton("Reset Game");
+        JButton customCodeButton = new JButton("Run My Code");
+
+        resetButton.addActionListener(e -> resetGame());
+
+        // This triggers your custom algorithm thread
+        customCodeButton.addActionListener(e -> {
+            resetGame();
+            statusLabel.setText("Running your custom algorithm...");
+            new Thread(() -> {
+                // Calls your custom method below
+                runMyCustomAlgorithm();
+                statusLabel.setText("Your code finished executing! Total moves: " + totalMoves);
+            }).start();
+        });
+
+        controlPanel.add(resetButton);
+        controlPanel.add(customCodeButton);
+
+        add(statusLabel, BorderLayout.NORTH);
+        add(gamePanel, BorderLayout.CENTER);
+        add(controlPanel, BorderLayout.SOUTH);
+    }
+
+    // =================================================================
+    // WRITE YOUR OWN CODE HERE
+    // =================================================================
+    private void runMyCustomAlgorithm() {
+
+        moveDisk(0, 2);
+        // TODO: Write your own algorithm here!
+        // Hint: You can use the moveDisk(from, to) method to move disks.
+        // Example: To move the top disk of Peg 1 to Peg 3, write: moveDisk(0, 2);
+
+
+    }
+    // =================================================================
+
+    /**
+     * Moves a disk from one peg to another safely and handles UI rendering.
+     * Use this method inside your custom algorithm!
+     * @param from The source peg index (0, 1, or 2)
+     * @param to The destination peg index (0, 1, or 2)
+     */
+    public void moveDisk(int from, int to) {
+        if (from < 0 || from > 2 || to < 0 || to > 2) return;
+        if (towers[from].isEmpty()) return;
+
+        // Rules check to prevent game state breaking
+        if (!towers[to].isEmpty() && towers[from].peek() > towers[to].peek()) {
+            System.out.println("Warning: Your algorithm attempted an illegal move (larger on smaller)!");
+            return;
+        }
+
+        towers[to].push(towers[from].pop());
+        totalMoves++;
+        gamePanel.repaint();
+
+        // Pause for half a second between moves so you can watch your code execute visually
+        try { Thread.sleep(500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+    }
+
+    private void handlePegClick(int pegIndex) {
+        if (selectedPeg == -1) {
+            if (towers[pegIndex].isEmpty()) {
+                statusLabel.setText("That peg is empty! Select another.");
+                return;
+            }
+            selectedPeg = pegIndex;
+            statusLabel.setText("Selected Peg " + (pegIndex + 1) + ". Click target peg to drop.");
+        } else {
+            int from = selectedPeg;
+            int to = pegIndex;
+            selectedPeg = -1;
+
+            if (from == to) {
+                statusLabel.setText("Cancelled move.");
+                gamePanel.repaint();
+                return;
+            }
+
+            if (!towers[to].isEmpty() && towers[from].peek() > towers[to].peek()) {
+                statusLabel.setText("Illegal Move! Cannot place larger disk on smaller disk.");
+            } else {
+                towers[to].push(towers[from].pop());
+                totalMoves++;
+                if (towers[2].size() == MAX_DISKS) {
+                    statusLabel.setText("Victory! You solved it manually in " + totalMoves + " moves!");
+                } else {
+                    statusLabel.setText("Moves: " + totalMoves);
+                }
+            }
+        }
+        gamePanel.repaint();
+    }
+
+    private void resetDisks() {
+        for (int i = 0; i < 3; i++) towers[i].clear();
+        for (int i = MAX_DISKS; i > 0; i--) towers[0].push(i);
+    }
+
+    private void resetGame() {
+        resetDisks();
+        totalMoves = 0;
+        selectedPeg = -1;
+        statusLabel.setText("Game reset. Ready.");
+        gamePanel.repaint();
+    }
+
+    private class GamePanel extends JPanel {
+        public GamePanel() {
+            setBackground(Color.WHITE);
+            setLayout(new GridLayout(1, 3));
+            for (int i = 0; i < 3; i++) {
+                final int index = i;
+                JButton pegButton = new JButton();
+                pegButton.setOpaque(false);
+                pegButton.setContentAreaFilled(false);
+                pegButton.setBorderPainted(false);
+                pegButton.addActionListener(e -> handlePegClick(index));
+                add(pegButton);
+            }
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int sectionWidth = getWidth() / 3;
+            g2.setColor(new Color(139, 69, 19));
+            g2.fillRect(10, getHeight() - 40, getWidth() - 20, 20);
+
+            for (int i = 0; i < 3; i++) {
+                int pegX = (i * sectionWidth) + (sectionWidth / 2) - 5;
+                g2.setColor(i == selectedPeg ? Color.RED : Color.DARK_GRAY);
+                g2.fillRect(pegX, 100, 10, getHeight() - 140);
+
+                Object[] disks = towers[i].toArray();
+                for (int j = 0; j < disks.length; j++) {
+                    int diskSize = (Integer) disks[j];
+                    int diskWidth = diskSize * 30 + 20;
+                    int diskHeight = 20;
+                    int diskX = (i * sectionWidth) + (sectionWidth / 2) - (diskWidth / 2);
+                    int diskY = getHeight() - 40 - ((j + 1) * diskHeight);
+
+                    g2.setColor(new Color((diskSize * 45) % 255, (diskSize * 90) % 255, 200));
+                    g2.fillRoundRect(diskX, diskY, diskWidth, diskHeight, 10, 10);
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new TowerOfHanoi().setVisible(true));
+    }
+}
