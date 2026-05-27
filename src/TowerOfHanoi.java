@@ -14,6 +14,8 @@ public class TowerOfHanoi extends JFrame {
 
     private GamePanel gamePanel;
     private JLabel statusLabel;
+    private JLabel largestLabel;
+    private JLabel testLabel;
 
     public TowerOfHanoi() {
         setTitle("Tower of Hanoi - My Algorithm Lab");
@@ -34,6 +36,14 @@ public class TowerOfHanoi extends JFrame {
         statusLabel.setFont(new Font("Arial", Font.BOLD, 16));
         statusLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        largestLabel = new JLabel("Biggest stack peg: " + biggestStackPeg(), SwingConstants.CENTER);
+        largestLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        largestLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        testLabel = new JLabel("biggest disk: " + towers[0].getLast(), SwingConstants.CENTER);
+        testLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        testLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         JPanel controlPanel = new JPanel();
         JButton resetButton = new JButton("Reset Game");
         JButton customCodeButton = new JButton("Run My Code");
@@ -42,7 +52,7 @@ public class TowerOfHanoi extends JFrame {
 
         // This triggers your custom algorithm thread
         customCodeButton.addActionListener(e -> {
-            resetGame();
+//            resetGame();
             statusLabel.setText("Running your custom algorithm...");
             new Thread(() -> {
                 // Calls your custom method below
@@ -55,6 +65,8 @@ public class TowerOfHanoi extends JFrame {
         controlPanel.add(customCodeButton);
 
         add(statusLabel, BorderLayout.NORTH);
+        add(largestLabel, BorderLayout.EAST);
+        add(testLabel, BorderLayout.EAST);
         add(gamePanel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
     }
@@ -62,12 +74,96 @@ public class TowerOfHanoi extends JFrame {
     // =================================================================
     // WRITE YOUR OWN CODE HERE
     // =================================================================
+
+    public double biggestDisk = MAX_DISKS;
+    public boolean isOdd(int i){
+
+        return(i % 2 == 1);
+    }
+    public int goalPeg(int stackSize, int currentPeg, int goalPeg){
+
+        if(isOdd(stackSize)){
+
+           return goalPeg;
+        }
+        else{
+
+            if(currentPeg == 0){
+
+                if(goalPeg == 1){
+
+                    return 2;
+                }
+                else{
+
+                    return 1;
+                }
+            }
+            else if(currentPeg == 1){
+
+                if(goalPeg == 0){
+
+                    return 2;
+                }
+                else{
+
+                    return 0;
+                }
+            }
+            else{
+
+                if(goalPeg == 0){
+
+                    return 1;
+                }
+                else{
+
+                    return 0;
+                }
+            }
+        }
+
+    }
+
+    public void runGoalPeg(){
+
+        moveDisk(biggestStackPeg(), goalPeg(towers[biggestStackPeg()].size(), biggestStackPeg(), 2));
+
+    }
+
+    public int biggestStackPeg(){
+
+        int currentLargest = 0;
+        int candidate = -1;
+
+        for(int i = 0; i < 3; i++){
+
+            if(towers[i].size() > currentLargest){
+
+                currentLargest = towers[i].size();
+                candidate = i;
+            }
+
+        }
+
+        return candidate;
+    }
+
+    public void solveTest3Disk(){
+
+        int goalDisk = MAX_DISKS;
+        int goalPeg = 2;
+
+    }
+
+
+
+
     private void runMyCustomAlgorithm() {
 
-        moveDisk(0, 2);
-        // TODO: Write your own algorithm here!
-        // Hint: You can use the moveDisk(from, to) method to move disks.
-        // Example: To move the top disk of Peg 1 to Peg 3, write: moveDisk(0, 2);
+        largestLabel.setText("Peg with largest stack: " + biggestStackPeg());
+        testLabel.setText("Largest disk: " + towers[0].firstElement());
+
 
 
     }
