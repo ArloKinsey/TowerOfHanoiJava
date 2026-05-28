@@ -3,8 +3,8 @@ import java.awt.*;
 import java.util.Stack;
 
 public class TowerOfHanoi extends JFrame {
-    private static final int WIDTH = 1200;
-    private static final int HEIGHT = 700;
+    private static final int WIDTH = 1100;
+    private static final int HEIGHT = 600;
     private static  int MAX_DISKS = 5;
     private static int WAIT_TIME = 500;
 
@@ -54,18 +54,34 @@ public class TowerOfHanoi extends JFrame {
 
         JSlider sleepSlider = new JSlider(0, 1000);
 
+        resetButton.addActionListener(e -> {
 
-        resetButton.addActionListener(e -> resetGame());
+            resetGame();
+            sleepSlider.setValue(500);
 
+        });
 
         // This triggers your custom algorithm thread
         customCodeButton.addActionListener(e -> {
-//            resetGame();
+
+            resetGame();
+            controlPanel.add(sleepSlider);
+            controlPanel.remove(resetButton);
+            controlPanel.remove(customCodeButton);
+            controlPanel.remove(diskAmountSlider);
+
             statusLabel.setText("Running your custom algorithm...");
+
             new Thread(() -> {
                 // Calls your custom method below
                 runMyCustomAlgorithm();
                 statusLabel.setText("Your code finished executing! Total moves: " + totalMoves);
+
+                controlPanel.remove(sleepSlider);
+                controlPanel.add(resetButton);
+                controlPanel.add(customCodeButton);
+                controlPanel.add(diskAmountSlider);
+
             }).start();
         });
 
@@ -78,19 +94,15 @@ public class TowerOfHanoi extends JFrame {
 
         sleepSlider.addChangeListener(e -> {
 
-
             WAIT_TIME = sleepSlider.getValue();
 
         });
 
-        controlPanel.add(sleepSlider);
         controlPanel.add(resetButton);
         controlPanel.add(customCodeButton);
         controlPanel.add(diskAmountSlider);
 
         add(statusLabel, BorderLayout.NORTH);
-//        add(largestLabel, BorderLayout.EAST);
-//        add(testLabel, BorderLayout.EAST);
         add(gamePanel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
     }
@@ -99,7 +111,6 @@ public class TowerOfHanoi extends JFrame {
     // WRITE YOUR OWN CODE HERE
     // =================================================================
 
-    public double biggestDisk = MAX_DISKS;
     public boolean isOdd(int i){
 
         return(i % 2 == 1);
@@ -170,174 +181,23 @@ public class TowerOfHanoi extends JFrame {
         return candidate;
     }
 
-    public void sequence1(int startPeg, int endPeg){
+    public void moveStack(int size, int start, int end){
 
-        if(startPeg != endPeg){
+        if(size > 1){
 
-            moveDisk(startPeg, goalPeg(1, startPeg, endPeg));
+            moveStack(size - 1, start, storePeg(start, end));
+            moveDisk(start, end);
+            moveStack(size - 1, storePeg(start, end), end);
+        }
+        else{
+            moveDisk(start, end);
         }
 
     }
-
-    public void sequence2(int startPeg, int endPeg){
-
-        if(startPeg != endPeg) {
-
-            sequence1(startPeg, storePeg(startPeg, endPeg));
-
-            moveDisk(startPeg, endPeg);
-
-            sequence1(storePeg(startPeg, endPeg), endPeg);
-        }
-    }
-
-    public void sequence3(int startPeg, int endPeg){
-
-        if(startPeg != endPeg) {
-
-            sequence2(startPeg, storePeg(startPeg, endPeg));
-
-            moveDisk(startPeg, endPeg);
-
-            sequence2(storePeg(startPeg, endPeg), endPeg);
-        }
-    }
-
-    public void sequence4(int startPeg, int endPeg){
-
-        if(startPeg != endPeg) {
-
-            sequence3(startPeg, storePeg(startPeg, endPeg));
-
-            moveDisk(startPeg, endPeg);
-
-            sequence3(storePeg(startPeg, endPeg), endPeg);
-        }
-    }
-
-    public void sequence5(int startPeg, int endPeg){
-
-        if(startPeg != endPeg) {
-
-            sequence4(startPeg, storePeg(startPeg, endPeg));
-
-            moveDisk(startPeg, endPeg);
-
-            sequence4(storePeg(startPeg, endPeg), endPeg);
-        }
-    }
-
-    public void sequence6(int startPeg, int endPeg){
-
-        if(startPeg != endPeg) {
-
-            sequence5(startPeg, storePeg(startPeg, endPeg));
-
-            moveDisk(startPeg, endPeg);
-
-            sequence5(storePeg(startPeg, endPeg), endPeg);
-        }
-    }
-
-    public void sequence7(int startPeg, int endPeg){
-
-        if(startPeg != endPeg) {
-
-            sequence6(startPeg, storePeg(startPeg, endPeg));
-
-            moveDisk(startPeg, endPeg);
-
-            sequence6(storePeg(startPeg, endPeg), endPeg);
-        }
-    }
-
-    public void sequence8(int startPeg, int endPeg){
-
-        if(startPeg != endPeg) {
-
-            sequence7(startPeg, storePeg(startPeg, endPeg));
-
-            moveDisk(startPeg, endPeg);
-
-            sequence7(storePeg(startPeg, endPeg), endPeg);
-        }
-    }
-
-    public void sequence9(int startPeg, int endPeg){
-
-        if(startPeg != endPeg) {
-
-            sequence8(startPeg, storePeg(startPeg, endPeg));
-
-            moveDisk(startPeg, endPeg);
-
-            sequence8(storePeg(startPeg, endPeg), endPeg);
-        }
-    }
-
-    public void sequence10(int startPeg, int endPeg){
-
-        if(startPeg != endPeg) {
-
-            sequence9(startPeg, storePeg(startPeg, endPeg));
-
-            moveDisk(startPeg, endPeg);
-
-            sequence9(storePeg(startPeg, endPeg), endPeg);
-        }
-    }
-
-
-
 
     private void runMyCustomAlgorithm() {
-//        largestLabel.setText("Peg with largest stack: " + biggestStackPeg());
-//        testLabel.setText("Largest disk: " + towers[0].firstElement());
 
-        if(MAX_DISKS == 1){
-
-            sequence1(0, 2);
-        }
-        else if(MAX_DISKS == 2){
-
-            sequence2(0, 2);
-        }
-        else if(MAX_DISKS == 3){
-
-            sequence3(0, 2);
-        }
-        else if(MAX_DISKS == 4){
-
-            sequence4(0, 2);
-        }
-        else if(MAX_DISKS == 5){
-
-            sequence5(0, 2);
-        }
-        else if(MAX_DISKS == 6){
-
-            sequence6(0, 2);
-        }
-        else if(MAX_DISKS == 7){
-
-            sequence7(0, 2);
-        }
-        else if(MAX_DISKS == 8){
-
-            sequence8(0, 2);
-        }
-        else if(MAX_DISKS == 9){
-
-            sequence9(0, 2);
-        }
-        else if(MAX_DISKS == 10){
-
-            sequence10(0, 2);
-        }
-
-
-
-
+        moveStack(MAX_DISKS, 0, 2);
 
     }
     // =================================================================
