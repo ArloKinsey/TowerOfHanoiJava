@@ -3,8 +3,8 @@ import java.awt.*;
 import java.util.Stack;
 
 public class TowerOfHanoi extends JFrame {
-    private static final int WIDTH = 800;
-    private static final int HEIGHT = 500;
+    private static final int WIDTH = 1200;
+    private static final int HEIGHT = 700;
     private static  int MAX_DISKS = 5;
     private static int WAIT_TIME = 500;
 
@@ -56,6 +56,7 @@ public class TowerOfHanoi extends JFrame {
 
 
         resetButton.addActionListener(e -> resetGame());
+
 
         // This triggers your custom algorithm thread
         customCodeButton.addActionListener(e -> {
