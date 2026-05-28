@@ -5,7 +5,7 @@ import java.util.Stack;
 public class TowerOfHanoi extends JFrame {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 500;
-    private static final int MAX_DISKS = 10;
+    private static  int MAX_DISKS = 5;
     private static final int WAIT_TIME = 10; //500 Default
 
     // The three pegs tracked using standard Java Stacks
@@ -49,6 +49,9 @@ public class TowerOfHanoi extends JFrame {
         JButton resetButton = new JButton("Reset Game");
         JButton customCodeButton = new JButton("Run My Code");
 
+        JSlider diskAmountSlider = new JSlider(2, 10);
+        diskAmountSlider.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         resetButton.addActionListener(e -> resetGame());
 
         // This triggers your custom algorithm thread
@@ -62,8 +65,16 @@ public class TowerOfHanoi extends JFrame {
             }).start();
         });
 
+        diskAmountSlider.addChangeListener(e -> {
+
+            resetGame();
+            MAX_DISKS = diskAmountSlider.getValue();
+
+        });
+
         controlPanel.add(resetButton);
         controlPanel.add(customCodeButton);
+        controlPanel.add(diskAmountSlider);
 
         add(statusLabel, BorderLayout.NORTH);
 //        add(largestLabel, BorderLayout.EAST);
@@ -271,7 +282,7 @@ public class TowerOfHanoi extends JFrame {
 //        largestLabel.setText("Peg with largest stack: " + biggestStackPeg());
 //        testLabel.setText("Largest disk: " + towers[0].firstElement());
 
-        sequence10(0, 2);
+        sequence5(0, 2);
 
 
 
