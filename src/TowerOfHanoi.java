@@ -6,7 +6,7 @@ public class TowerOfHanoi extends JFrame {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 500;
     private static  int MAX_DISKS = 5;
-    private static final int WAIT_TIME = 10; //500 Default
+    private static int WAIT_TIME = 500;
 
     // The three pegs tracked using standard Java Stacks
     private Stack<Integer>[] towers = new Stack[3];
@@ -49,8 +49,11 @@ public class TowerOfHanoi extends JFrame {
         JButton resetButton = new JButton("Reset Game");
         JButton customCodeButton = new JButton("Run My Code");
 
-        JSlider diskAmountSlider = new JSlider(2, 10);
+        JSlider diskAmountSlider = new JSlider(1, 10);
         diskAmountSlider.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JSlider sleepSlider = new JSlider(0, 1000);
+
 
         resetButton.addActionListener(e -> resetGame());
 
@@ -72,6 +75,14 @@ public class TowerOfHanoi extends JFrame {
 
         });
 
+        sleepSlider.addChangeListener(e -> {
+
+
+            WAIT_TIME = sleepSlider.getValue();
+
+        });
+
+        controlPanel.add(sleepSlider);
         controlPanel.add(resetButton);
         controlPanel.add(customCodeButton);
         controlPanel.add(diskAmountSlider);
@@ -282,7 +293,48 @@ public class TowerOfHanoi extends JFrame {
 //        largestLabel.setText("Peg with largest stack: " + biggestStackPeg());
 //        testLabel.setText("Largest disk: " + towers[0].firstElement());
 
-        sequence5(0, 2);
+        if(MAX_DISKS == 1){
+
+            sequence1(0, 2);
+        }
+        else if(MAX_DISKS == 2){
+
+            sequence2(0, 2);
+        }
+        else if(MAX_DISKS == 3){
+
+            sequence3(0, 2);
+        }
+        else if(MAX_DISKS == 4){
+
+            sequence4(0, 2);
+        }
+        else if(MAX_DISKS == 5){
+
+            sequence5(0, 2);
+        }
+        else if(MAX_DISKS == 6){
+
+            sequence6(0, 2);
+        }
+        else if(MAX_DISKS == 7){
+
+            sequence7(0, 2);
+        }
+        else if(MAX_DISKS == 8){
+
+            sequence8(0, 2);
+        }
+        else if(MAX_DISKS == 9){
+
+            sequence9(0, 2);
+        }
+        else if(MAX_DISKS == 10){
+
+            sequence10(0, 2);
+        }
+
+
 
 
 
@@ -398,7 +450,7 @@ public class TowerOfHanoi extends JFrame {
                     int diskX = (i * sectionWidth) + (sectionWidth / 2) - (diskWidth / 2);
                     int diskY = getHeight() - 40 - ((j + 1) * diskHeight);
 
-                    g2.setColor(new Color((diskSize * 45) % 255, (diskSize * 90) % 255, 200));
+                    g2.setColor(new Color(100, (diskSize * 64) % 255, 200));
                     g2.fillRoundRect(diskX, diskY, diskWidth, diskHeight, 10, 10);
                 }
             }
