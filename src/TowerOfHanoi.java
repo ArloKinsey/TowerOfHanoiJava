@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Stack;
 
+
 public class TowerOfHanoi extends JFrame {
     private static final int WIDTH = 1100;
     private static final int HEIGHT = 600;
@@ -15,8 +16,7 @@ public class TowerOfHanoi extends JFrame {
 
     private GamePanel gamePanel;
     private JLabel statusLabel;
-    private JLabel largestLabel;
-    private JLabel testLabel;
+    private boolean lockControls = false;
 
     public TowerOfHanoi() {
         setTitle("Tower of Hanoi - My Algorithm Lab");
@@ -37,38 +37,52 @@ public class TowerOfHanoi extends JFrame {
         statusLabel.setFont(new Font("Arial", Font.BOLD, 16));
         statusLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        largestLabel = new JLabel("Biggest stack peg: " + biggestStackPeg(), SwingConstants.CENTER);
-        largestLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        largestLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        testLabel = new JLabel("biggest disk: " + towers[0].getLast(), SwingConstants.CENTER);
-        testLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        testLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
         JPanel controlPanel = new JPanel();
         JButton resetButton = new JButton("Reset Game");
         JButton customCodeButton = new JButton("Run My Code");
 
         JSlider diskAmountSlider = new JSlider(1, 10);
-        diskAmountSlider.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        diskAmountSlider.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JSlider sleepSlider = new JSlider(0, 1000);
+        JLabel disksLabel = new JLabel("Disks: 10", SwingConstants.CENTER);
+        disksLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        disksLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Dimension disksLabelSize = disksLabel.getPreferredSize();
+        disksLabel.setPreferredSize(disksLabelSize);
+        disksLabel.setText("Disks: " + diskAmountSlider.getValue());
+
+        JSlider speedSlider = new JSlider(0, 1000);
+
+        JLabel speedLabel = new JLabel("Speed (ms): 1000", SwingConstants.RIGHT);
+        speedLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        speedLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        Dimension speedLabelSize = speedLabel.getPreferredSize();
+        speedLabel.setPreferredSize(speedLabelSize);
+        speedLabel.setText("Speed (ms): " + WAIT_TIME);
+
+
 
         resetButton.addActionListener(e -> {
 
             resetGame();
-            sleepSlider.setValue(500);
+            speedSlider.setValue(500);
 
         });
 
         // This triggers your custom algorithm thread
         customCodeButton.addActionListener(e -> {
 
+            lockControls = true;
+
+            speedSlider.setValue(500);
+
             resetGame();
-            controlPanel.add(sleepSlider);
+            controlPanel.add(speedSlider);
+            controlPanel.add(speedLabel);
             controlPanel.remove(resetButton);
             controlPanel.remove(customCodeButton);
             controlPanel.remove(diskAmountSlider);
+            controlPanel.remove(disksLabel);
 
             statusLabel.setText("Running your custom algorithm...");
 
@@ -77,10 +91,13 @@ public class TowerOfHanoi extends JFrame {
                 runMyCustomAlgorithm();
                 statusLabel.setText("Your code finished executing! Total moves: " + totalMoves);
 
-                controlPanel.remove(sleepSlider);
+                controlPanel.remove(speedSlider);
+                controlPanel.remove(speedLabel);
                 controlPanel.add(resetButton);
                 controlPanel.add(customCodeButton);
                 controlPanel.add(diskAmountSlider);
+                controlPanel.add(disksLabel);
+                lockControls = false;
 
             }).start();
         });
@@ -89,18 +106,21 @@ public class TowerOfHanoi extends JFrame {
 
             resetGame();
             MAX_DISKS = diskAmountSlider.getValue();
+            disksLabel.setText("Disks: " + MAX_DISKS);
 
         });
 
-        sleepSlider.addChangeListener(e -> {
+        speedSlider.addChangeListener(e -> {
 
-            WAIT_TIME = sleepSlider.getValue();
+            WAIT_TIME = 1000 - speedSlider.getValue();
+            speedLabel.setText("Speed (ms): " + WAIT_TIME);
 
         });
 
         controlPanel.add(resetButton);
         controlPanel.add(customCodeButton);
         controlPanel.add(diskAmountSlider);
+        controlPanel.add(disksLabel);
 
         add(statusLabel, BorderLayout.NORTH);
         add(gamePanel, BorderLayout.CENTER);
@@ -284,7 +304,10 @@ public class TowerOfHanoi extends JFrame {
                 pegButton.setContentAreaFilled(false);
                 pegButton.setBorderPainted(false);
                 pegButton.addActionListener(e -> handlePegClick(index));
-                add(pegButton);
+
+                if(!lockControls){
+                    add(pegButton);
+                }
             }
         }
 
