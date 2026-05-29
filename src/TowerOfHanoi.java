@@ -68,6 +68,8 @@ public class TowerOfHanoi extends JFrame {
             speedSlider.setValue(500);
             System.out.println("Largest bottom disk: " + biggestDiskPeg());
 
+            System.out.println("Disk 1 location: " + findThisDisk(1));
+
         });
 
         // This triggers your custom algorithm thread
@@ -77,7 +79,7 @@ public class TowerOfHanoi extends JFrame {
 
             speedSlider.setValue(500);
 
-            resetGame();
+//            resetGame();
             controlPanel.add(speedSlider);
             controlPanel.add(speedLabel);
             controlPanel.remove(resetButton);
@@ -202,23 +204,50 @@ public class TowerOfHanoi extends JFrame {
         return new Point (peg, currentLargest);
     }
 
+    public Point findThisDisk(int diskSize){
+
+        for(int i = 0; i < 3; i++){
+
+            if(!towers[i].isEmpty() && towers[i].contains(diskSize)){
+
+               return new Point(i, towers[i].indexOf(diskSize));
+            }
+        }
+
+        return new Point(-1, -1);
+    }
+
+    public void unscramble(int size){
+
+        if(size + 1 <= MAX_DISKS){
+
+            moveStack(size, findThisDisk(size).x, findThisDisk(size + 1).x);
+        }
+
+    }
+
     public void moveStack(int size, int start, int end){
 
-        if(size > 1){
+        if(start != end) {
 
-            moveStack(size - 1, start, storePeg(start, end));
-            moveDisk(start, end);
-            moveStack(size - 1, storePeg(start, end), end);
-        }
-        else{
-            moveDisk(start, end);
+            if (size > 1) {
+
+                moveStack(size - 1, start, storePeg(start, end));
+                moveDisk(start, end);
+                moveStack(size - 1, storePeg(start, end), end);
+            } else {
+                moveDisk(start, end);
+            }
+
         }
 
     }
 
     private void runMyCustomAlgorithm() {
 
-        moveStack(MAX_DISKS, 0, 2);
+//        moveStack(MAX_DISKS, 0, 2);
+
+        unscramble(MAX_DISKS - 1);
 
     }
     // =================================================================
