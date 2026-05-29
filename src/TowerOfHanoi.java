@@ -204,6 +204,7 @@ public class TowerOfHanoi extends JFrame {
         return new Point (peg, currentLargest);
     }
 
+
     public Point findThisDisk(int diskSize){
 
         for(int i = 0; i < 3; i++){
