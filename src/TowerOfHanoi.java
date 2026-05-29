@@ -66,6 +66,7 @@ public class TowerOfHanoi extends JFrame {
 
             resetGame();
             speedSlider.setValue(500);
+            System.out.println("Largest bottom disk: " + biggestDiskPeg());
 
         });
 
@@ -183,22 +184,22 @@ public class TowerOfHanoi extends JFrame {
 
         return goalPeg(2, currentPeg, goalPeg);
     }
-    public int biggestStackPeg(){
+    public Point biggestDiskPeg(){
 
         int currentLargest = 0;
-        int candidate = -1;
+        int peg = -1;
 
         for(int i = 0; i < 3; i++){
 
-            if(towers[i].size() > currentLargest){
+            if(!towers[i].isEmpty() && towers[i].firstElement() > currentLargest){
 
-                currentLargest = towers[i].size();
-                candidate = i;
+                currentLargest = towers[i].firstElement();
+                peg = i;
             }
 
         }
 
-        return candidate;
+        return new Point (peg, currentLargest);
     }
 
     public void moveStack(int size, int start, int end){
