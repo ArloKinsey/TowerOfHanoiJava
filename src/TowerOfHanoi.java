@@ -227,6 +227,15 @@ public class TowerOfHanoi extends JFrame {
 
     }
 
+    public void bigUnscramble(){
+
+        for(int i = MAX_DISKS - 1; i > 0; i--){
+
+            unscramble(i);
+        }
+
+    }
+
     public void moveStack(int size, int start, int end){
 
         if(start != end) {
@@ -246,9 +255,7 @@ public class TowerOfHanoi extends JFrame {
 
     private void runMyCustomAlgorithm() {
 
-//        moveStack(MAX_DISKS, 0, 2);
-
-        unscramble(MAX_DISKS - 1);
+        moveStack(MAX_DISKS, 0, 2);
 
     }
     // =================================================================
