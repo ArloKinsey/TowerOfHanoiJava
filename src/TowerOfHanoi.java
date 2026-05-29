@@ -17,6 +17,7 @@ public class TowerOfHanoi extends JFrame {
     private GamePanel gamePanel;
     private JLabel statusLabel;
     private boolean lockControls = false;
+    private int colorInt = 1;
 
     public TowerOfHanoi() {
         setTitle("Tower of Hanoi - My Algorithm Lab");
@@ -33,13 +34,15 @@ public class TowerOfHanoi extends JFrame {
 
         // Create UI components
         gamePanel = new GamePanel();
-        statusLabel = new JLabel("Click a peg to move manually, or press 'Run My Code'!", SwingConstants.CENTER);
+        statusLabel = new JLabel("Click a peg to move manually, or press 'Run Code'!          ", SwingConstants.CENTER);
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(10, 100, 10, 10));
         statusLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        statusLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Dimension statusLabelSize = statusLabel.getPreferredSize();
+        statusLabel.setPreferredSize(statusLabelSize);
 
         JPanel controlPanel = new JPanel();
         JButton resetButton = new JButton("Reset Game");
-        JButton customCodeButton = new JButton("Run My Code");
+        JButton customCodeButton = new JButton("Run Code");
 
         JSlider diskAmountSlider = new JSlider(1, 10);
         diskAmountSlider.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -60,15 +63,43 @@ public class TowerOfHanoi extends JFrame {
         speedLabel.setPreferredSize(speedLabelSize);
         speedLabel.setText("Speed (ms): " + WAIT_TIME);
 
+        JPanel colorPanel = new JPanel();
+
+        JButton redButton = new JButton();
+        redButton.setBackground(new Color(200, 50, 50));
+        redButton.setPreferredSize(new Dimension(50, 30));
+        redButton.addActionListener(e -> {
+
+           colorInt = 1;
+           gamePanel.repaint();
+
+        });
+
+        JButton greenButton = new JButton();
+        greenButton.setBackground(new Color(50, 200, 50));
+        greenButton.setPreferredSize(new Dimension(50, 30));
+        greenButton.addActionListener(e -> {
+
+            colorInt = 2;
+            gamePanel.repaint();
+
+        });
+
+        JButton blueButton = new JButton();
+        blueButton.setBackground(new Color(50, 50, 200));
+        blueButton.setPreferredSize(new Dimension(50, 30));
+        blueButton.addActionListener(e -> {
+
+            colorInt = 3;
+            gamePanel.repaint();
+
+        });
 
 
         resetButton.addActionListener(e -> {
 
             resetGame();
             speedSlider.setValue(500);
-            System.out.println("Largest bottom disk: " + biggestDiskPeg());
-
-            System.out.println("Disk 1 location: " + findThisDisk(1));
 
         });
 
@@ -87,12 +118,12 @@ public class TowerOfHanoi extends JFrame {
             controlPanel.remove(diskAmountSlider);
             controlPanel.remove(disksLabel);
 
-            statusLabel.setText("Running your custom algorithm...");
+            statusLabel.setText("Running custom algorithm...");
 
             new Thread(() -> {
                 // Calls your custom method below
                 runMyCustomAlgorithm();
-                statusLabel.setText("Your code finished executing! Total moves: " + totalMoves);
+                statusLabel.setText("Code finished executing! Total moves: " + totalMoves);
 
                 controlPanel.remove(speedSlider);
                 controlPanel.remove(speedLabel);
@@ -125,9 +156,14 @@ public class TowerOfHanoi extends JFrame {
         controlPanel.add(diskAmountSlider);
         controlPanel.add(disksLabel);
 
-        add(statusLabel, BorderLayout.NORTH);
+        colorPanel.add(redButton);
+        colorPanel.add(greenButton);
+        colorPanel.add(blueButton);
+        colorPanel.add(statusLabel);
+
         add(gamePanel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
+        add(colorPanel, BorderLayout.NORTH);
     }
 
     // =================================================================
@@ -330,7 +366,7 @@ public class TowerOfHanoi extends JFrame {
         resetDisks();
         totalMoves = 0;
         selectedPeg = -1;
-        statusLabel.setText("Game reset. Ready.");
+        statusLabel.setText("Game reset.");
         gamePanel.repaint();
     }
 
@@ -372,7 +408,19 @@ public class TowerOfHanoi extends JFrame {
                     int diskX = (i * sectionWidth) + (sectionWidth / 2) - (diskWidth / 2);
                     int diskY = getHeight() - 40 - ((j + 1) * diskHeight);
 
-                    g2.setColor(new Color(100, (diskSize * 64) % 255, 200));
+                    if(colorInt == 1){
+
+                        g2.setColor(new Color(100 + ((diskSize * 60) % 180), 0, 0));
+                    }
+                    else if(colorInt == 2){
+
+                        g2.setColor(new Color(0, 100 + ((diskSize * 60) % 180), 0));
+                    }
+                    else{
+
+                        g2.setColor(new Color(0, 50, 100 + ((diskSize * 60) % 180)));
+                    }
+
                     g2.fillRoundRect(diskX, diskY, diskWidth, diskHeight, 10, 10);
                 }
             }
