@@ -79,7 +79,7 @@ public class TowerOfHanoi extends JFrame {
 
             speedSlider.setValue(500);
 
-//            resetGame();
+            resetGame();
             controlPanel.add(speedSlider);
             controlPanel.add(speedLabel);
             controlPanel.remove(resetButton);
@@ -285,37 +285,40 @@ public class TowerOfHanoi extends JFrame {
     }
 
     private void handlePegClick(int pegIndex) {
-        if (selectedPeg == -1) {
-            if (towers[pegIndex].isEmpty()) {
-                statusLabel.setText("That peg is empty! Select another.");
-                return;
-            }
-            selectedPeg = pegIndex;
-            statusLabel.setText("Selected Peg " + (pegIndex + 1) + ". Click target peg to drop.");
-        } else {
-            int from = selectedPeg;
-            int to = pegIndex;
-            selectedPeg = -1;
 
-            if (from == to) {
-                statusLabel.setText("Cancelled move.");
-                gamePanel.repaint();
-                return;
-            }
-
-            if (!towers[to].isEmpty() && towers[from].peek() > towers[to].peek()) {
-                statusLabel.setText("Illegal Move! Cannot place larger disk on smaller disk.");
+        if(!lockControls) {
+            if (selectedPeg == -1) {
+                if (towers[pegIndex].isEmpty()) {
+                    statusLabel.setText("That peg is empty! Select another.");
+                    return;
+                }
+                selectedPeg = pegIndex;
+                statusLabel.setText("Selected Peg " + (pegIndex + 1) + ". Click target peg to drop.");
             } else {
-                towers[to].push(towers[from].pop());
-                totalMoves++;
-                if (towers[2].size() == MAX_DISKS) {
-                    statusLabel.setText("Victory! You solved it manually in " + totalMoves + " moves!");
+                int from = selectedPeg;
+                int to = pegIndex;
+                selectedPeg = -1;
+
+                if (from == to) {
+                    statusLabel.setText("Cancelled move.");
+                    gamePanel.repaint();
+                    return;
+                }
+
+                if (!towers[to].isEmpty() && towers[from].peek() > towers[to].peek()) {
+                    statusLabel.setText("Illegal Move! Cannot place larger disk on smaller disk.");
                 } else {
-                    statusLabel.setText("Moves: " + totalMoves);
+                    towers[to].push(towers[from].pop());
+                    totalMoves++;
+                    if (towers[2].size() == MAX_DISKS) {
+                        statusLabel.setText("Victory! You solved it manually in " + totalMoves + " moves!");
+                    } else {
+                        statusLabel.setText("Moves: " + totalMoves);
+                    }
                 }
             }
+            gamePanel.repaint();
         }
-        gamePanel.repaint();
     }
 
     private void resetDisks() {
@@ -342,10 +345,7 @@ public class TowerOfHanoi extends JFrame {
                 pegButton.setContentAreaFilled(false);
                 pegButton.setBorderPainted(false);
                 pegButton.addActionListener(e -> handlePegClick(index));
-
-                if(!lockControls){
-                    add(pegButton);
-                }
+                add(pegButton);
             }
         }
 
