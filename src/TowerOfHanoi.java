@@ -110,7 +110,7 @@ public class TowerOfHanoi extends JFrame {
 
             speedSlider.setValue(500);
 
-            resetGame();
+            //resetGame();
             controlPanel.add(speedSlider);
             controlPanel.add(speedLabel);
             controlPanel.remove(resetButton);
@@ -220,7 +220,19 @@ public class TowerOfHanoi extends JFrame {
     }
     public int storePeg(int currentPeg, int goalPeg){
 
-        return goalPeg(2, currentPeg, goalPeg);
+        if(currentPeg != goalPeg) {
+
+            for (int i = 0; i < 2; i++) {
+
+                if (i != currentPeg && i != goalPeg) {
+
+                    return i;
+                }
+            }
+            return 2;
+        }
+        return -1;
+
     }
     public Point biggestDiskPeg(){
 
@@ -239,7 +251,6 @@ public class TowerOfHanoi extends JFrame {
 
         return new Point (peg, currentLargest);
     }
-
 
     public Point findThisDisk(int diskSize){
 
@@ -289,9 +300,58 @@ public class TowerOfHanoi extends JFrame {
 
     }
 
+    public boolean isMovePossible(int size, int start, int end){
+
+        if(start == end){
+
+            return true;
+        }
+        else if(towers[start].lastElement() == size) {
+
+            if (!towers[end].isEmpty()) {
+
+                if (!towers[start].isEmpty()) {
+
+                    return towers[start].lastElement() < towers[end].lastElement();
+
+                } else {
+
+                    return false;
+                }
+            } else {
+
+                return true;
+            }
+        }
+        else{
+            return false;
+        }
+    }
+
+    public void betterSolve(int size, int start, int end) {
+
+        if (size > 1) {
+
+            if (isMovePossible(size, start, end)) {
+
+                moveDisk(start, end);
+                betterSolve(size - 1, findThisDisk(size - 1).x, end);
+            } else {
+
+                betterSolve(size - 1, findThisDisk(size - 1).x, storePeg(start, end));
+                betterSolve(size, start, end);
+            }
+        }
+        else{
+
+            moveDisk(start, end);
+        }
+
+    }
+
     private void runMyCustomAlgorithm() {
 
-        moveStack(MAX_DISKS, 0, 2);
+        betterSolve(MAX_DISKS, findThisDisk(MAX_DISKS).x, 2);
 
     }
     // =================================================================
@@ -305,6 +365,7 @@ public class TowerOfHanoi extends JFrame {
     public void moveDisk(int from, int to) {
         if (from < 0 || from > 2 || to < 0 || to > 2) return;
         if (towers[from].isEmpty()) return;
+        if (from == to) return;
 
         // Rules check to prevent game state breaking
         if (!towers[to].isEmpty() && towers[from].peek() > towers[to].peek()) {
@@ -346,6 +407,7 @@ public class TowerOfHanoi extends JFrame {
                 } else {
                     towers[to].push(towers[from].pop());
                     totalMoves++;
+                    System.out.println(storePeg(1, 0));
                     if (towers[2].size() == MAX_DISKS) {
                         statusLabel.setText("Victory! You solved it manually in " + totalMoves + " moves!");
                     } else {
