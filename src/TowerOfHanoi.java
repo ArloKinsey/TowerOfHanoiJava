@@ -10,12 +10,12 @@ public class TowerOfHanoi extends JFrame {
     private static int WAIT_TIME = 500;
 
     // The three pegs tracked using standard Java Stacks
-    private Stack<Integer>[] towers = new Stack[3];
+    private final Stack<Integer>[] towers = new Stack[3];
     private int totalMoves = 0;
     private int selectedPeg = -1;
 
-    private GamePanel gamePanel;
-    private JLabel statusLabel;
+    private final GamePanel gamePanel;
+    private final JLabel statusLabel;
     private boolean lockControls = false;
     private int colorInt = 1;
 
@@ -170,54 +170,6 @@ public class TowerOfHanoi extends JFrame {
     // WRITE YOUR OWN CODE HERE
     // =================================================================
 
-    public boolean isOdd(int i){
-
-        return(i % 2 == 1);
-    }
-    public int goalPeg(int stackSize, int currentPeg, int goalPeg){
-
-        if(isOdd(stackSize)){
-
-           return goalPeg;
-        }
-        else{
-
-            if(currentPeg == 0){
-
-                if(goalPeg == 1){
-
-                    return 2;
-                }
-                else{
-
-                    return 1;
-                }
-            }
-            else if(currentPeg == 1){
-
-                if(goalPeg == 0){
-
-                    return 2;
-                }
-                else{
-
-                    return 0;
-                }
-            }
-            else{
-
-                if(goalPeg == 0){
-
-                    return 1;
-                }
-                else{
-
-                    return 0;
-                }
-            }
-        }
-
-    }
     public int storePeg(int currentPeg, int goalPeg){
 
         if(currentPeg != goalPeg) {
@@ -234,23 +186,6 @@ public class TowerOfHanoi extends JFrame {
         return -1;
 
     }
-    public Point biggestDiskPeg(){
-
-        int currentLargest = 0;
-        int peg = -1;
-
-        for(int i = 0; i < 3; i++){
-
-            if(!towers[i].isEmpty() && towers[i].firstElement() > currentLargest){
-
-                currentLargest = towers[i].firstElement();
-                peg = i;
-            }
-
-        }
-
-        return new Point (peg, currentLargest);
-    }
 
     public Point findThisDisk(int diskSize){
 
@@ -263,41 +198,6 @@ public class TowerOfHanoi extends JFrame {
         }
 
         return new Point(-1, -1);
-    }
-
-    public void unscramble(int size){
-
-        if(size + 1 <= MAX_DISKS){
-
-            moveStack(size, findThisDisk(size).x, findThisDisk(size + 1).x);
-        }
-
-    }
-
-    public void bigUnscramble(){
-
-        for(int i = MAX_DISKS - 1; i > 0; i--){
-
-            unscramble(i);
-        }
-
-    }
-
-    public void moveStack(int size, int start, int end){
-
-        if(start != end) {
-
-            if (size > 1) {
-
-                moveStack(size - 1, start, storePeg(start, end));
-                moveDisk(start, end);
-                moveStack(size - 1, storePeg(start, end), end);
-            } else {
-                moveDisk(start, end);
-            }
-
-        }
-
     }
 
     public boolean isMovePossible(int size, int start, int end){
@@ -393,19 +293,18 @@ public class TowerOfHanoi extends JFrame {
                 statusLabel.setText("Selected Peg " + (pegIndex + 1) + ". Click target peg to drop.");
             } else {
                 int from = selectedPeg;
-                int to = pegIndex;
                 selectedPeg = -1;
 
-                if (from == to) {
+                if (from == pegIndex) {
                     statusLabel.setText("Cancelled move.");
                     gamePanel.repaint();
                     return;
                 }
 
-                if (!towers[to].isEmpty() && towers[from].peek() > towers[to].peek()) {
+                if (!towers[pegIndex].isEmpty() && towers[from].peek() > towers[pegIndex].peek()) {
                     statusLabel.setText("Illegal Move! Cannot place larger disk on smaller disk.");
                 } else {
-                    towers[to].push(towers[from].pop());
+                    towers[pegIndex].push(towers[from].pop());
                     totalMoves++;
                     System.out.println(storePeg(1, 0));
                     if (towers[2].size() == MAX_DISKS) {
